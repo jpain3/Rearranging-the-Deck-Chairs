@@ -1,0 +1,759 @@
+{UTF-8}
+Died=
+	Died from Crossing Minimum Threshold + Died from Unsuccessful Evacuation
+	~	People
+	~	Accounting and Reporting: The total number of deaths from all causes
+	|
+
+Died from Crossing Minimum Threshold= INTEG (
+	Death from Crisis,
+		0)
+	~	People
+	~	Accounting and Reporting: The total number of deaths from the system \
+		crossing the minimum capability threshold to support life and resist crisis
+	|
+
+Died from Unsuccessful Evacuation= INTEG (
+	Unsuccessful Evacuation,
+		0)
+	~	People
+	~	Accounting and Reporting: The total number of deaths from the unsuccessful \
+		evacuations
+	|
+
+Activities Available for Mitigation=
+	Total Available Activities Possible-Activities Dedicated towards Evacuation
+	~	Activity/Hour
+	~	The available rate of activities that the populace exposed to the crisis \
+		could be doing that are not already reserved for evacuation activities.
+	|
+
+Capability Gap=
+	Baseline Capability-Capability to Resist Crisis
+	~	Dmnl
+	~	Gap between the baseline capability of the system to support life and \
+		resist a crisis and the current level.
+	|
+
+Effort Fraction Devoted towards Evacuation=
+	max(0,min(1,Concern Response Sensitivity*Concern for Safety-Concern Response Sensitivity\
+		))
+	~	Dmnl
+	~	Fraction of total available activities that are dedicated towards \
+		evacuation. This is functionally assumed to be a linearly increasing \
+		relationship, with 0% dedicated towards evacuation at the standard stress \
+		or concern level of 1, and then increasing at a rate determined by the \
+		sensitivity parameter until saturated at 100%.
+	|
+
+Avg Time for Death Under Crisis=
+	1
+	~	Hour
+	~	The time on average for a person to die once the system has crossed the \
+		threshold for minimum viable capability for supporting life and resisting \
+		crisis.
+	|
+
+Baseline Capability=
+	1
+	~	Dmnl
+	~	The beginning capability for the system to support life and actively \
+		resist an ongoing crisis. This is, typically, normalized to a value of 1.
+	|
+
+Baseline Efficacy of Evacuation Activities=
+	0.5
+	~	Dmnl
+	~	At baseline concern, what fraction of evacuations are successful
+	|
+
+People Exposed to Crisis= INTEG (
+	-Successful Evacuation-Unsuccessful Evacuation-Death from Crisis,
+		Initial People)
+	~	People
+	~	Number of people in the system currently exposed to any ongoing crisis
+	|
+
+Capability Gap Sensitivity=
+	1
+	~	Dmnl
+	~	Slope the linearly proportional response to the gap in capability
+	|
+
+Capability to Resist Crisis= INTEG (
+	Crisis Mitigation-Crisis Progression,
+		Baseline Capability)
+	~	Dmnl
+	~	The capability for the system to support life and actively resist an \
+		ongoing crisis. As a physical example, this would be the average height \
+		above the waterline for a ship on the ocean.
+	|
+
+Change in Concern from Perceived Capability=
+	(Indicated Concern from Capability-Concern for Safety)/Time to Update Perceptions of Concern
+	~	Dmnl/Hour
+	~	The change in the underlying concern or stress level expected from the \
+		population viewing the current capability of the system to support life or \
+		resist crisis.
+	|
+
+Efficacy of Evacuation Activities=
+	min(1,max(0,Net Effect of Concern on Behavior*Baseline Efficacy of Evacuation Activities\
+		))
+	~	Dmnl
+	~	The efficacy of evacuation activities determined by the baseline efficacy \
+		moderated by the effects of stress. See DOI 10.2307/3094889 for more \
+		details, but at low levels of stress, efficacy is increased, but for \
+		higher levels (panic) efficacy is decreased relative to the baseline.
+	|
+
+Change in Concern for Safety=
+	(Change in Concern from Perceived Capability + Change in Concern from Viewing Activities\
+		)
+	~	Dmnl/Hour
+	~	Change in the current concern or stress level of the population which is \
+		driven first by perceptions of the system loosing its ability to support \
+		life and resist crisis, moderated by the perceptions of evacuation and \
+		mitigation going on around the population.
+	|
+
+Concern Response Sensitivity=
+	0.05
+	~	Dmnl
+	~	Slope the linearly proportional response of the fraction of effort \
+		dedicated to evacuation to the current concern or stress level
+	|
+
+Crisis Mitigation=
+	Crisis Mitigation Activities*Effectiveness of Mitigation Activities
+	~	Dmnl/Hour
+	~	The rate at which the system's capability to support life is restored via \
+		the preventative and/or restorative mitigation efforts of the people \
+		exposed to the crisis. As a physical example, this would be the rate at \
+		which a sinking ship was kept above the waterline via bailing of water or \
+		some similar activity.
+	|
+
+Concern Raised from Preventative Actions=
+	Crisis Mitigation Activities*Effect of Viewing Mitigation on Concern for Safety
+	~	Dmnl/Hour
+	~	Rate at which concern or stress is generated from people seeing mitigation \
+		activities occurring.
+	|
+
+Death from Crisis=
+	max(0,if then else(Capability to Resist Crisis<Minimum Viable Capability, People Exposed to Crisis\
+		/Avg Time for Death Under Crisis,0))
+	~	People/Hour
+	~	Rate at which people leave the system, not from evacuation efforts but \
+		from succumbing to the crisis once the system's capability to support life \
+		or resist crisis has fallen below a minimum threshold.
+	|
+
+Crisis Mitigation Activities=
+	Activities Available for Mitigation*"Fraction of Non-Evacuation Efforts Spent of Mitigation"
+	~	Activity/Hour
+	~	Rate of activities that are being actively applied towards mitigation and \
+		maintenance of the system's capability to support life and resist an \
+		ongoing crisis
+	|
+
+Evacuated and Survived= INTEG (
+	Successful Evacuation,
+		0)
+	~	People
+	~	Accounting and Reporting: The total number of successful evacuations
+	~	:SUPPLEMENTARY 
+	|
+
+Survival Rate=
+	1-Died/Initial People
+	~	Dmnl
+	~	Accounting and Reporting: The fraction of the population alive at any \
+		given period of time
+	~	:SUPPLEMENTARY 
+	|
+
+Minimum Viable Capability=
+	0.01
+	~	Dmnl
+	~	The capability below which it is assumed that everyone left dies
+	|
+
+"Fraction of Non-Evacuation Efforts Spent of Mitigation"=
+	max(0,min(1,Capability Gap Sensitivity*Capability Gap))
+	~	Dmnl
+	~	Proportion of activities not dedicated already to evacuation that are \
+		spent on mitigation activities. Note that this is linearly proportional to \
+		the gap in this formulation, with the sensitivity affecting the slope of \
+		the response.
+	|
+
+Activities Dedicated towards Evacuation=
+	max(0,Total Available Activities Possible*Effort Fraction Devoted towards Evacuation\
+		)
+	~	Activity/Hour
+	~	The available rate of activities that the populace exposed to the crisis \
+		are dedicating towards evacuation activities.
+	|
+
+Activity Rate=
+	1
+	~	Activities/Person/Hour
+	~	How many activities a person can do in a unit of time
+	|
+
+Effectiveness of Evacuation Activities=
+	1
+	~	People/Activity
+	~	Rate at which activities that are being dedicated towards evacuation \
+		result in a person being evacuated. Note that this is not necessarily a \
+		successful evacuation. Smaller numbers are less effective.
+	|
+
+Indicated Concern from Capability=
+	Sensitivity of Concern to Capability*(Sensitivity of Concern to Capability^(-1*Capability to Resist Crisis\
+		))
+	~	Dmnl
+	~	How the capability of the system to support life or resist crisis \
+		translates into a measure of concern. Assumes an exponential relationship, \
+		centered on (1,1), moderated by the sensitivity parameter.
+	|
+
+Change in Concern from Viewing Activities=
+	Concern Raised from Evacuation + Concern Raised from Preventative Actions
+	~	Dmnl/Hour
+	~	Total net influence of the activities of the people exposed to the crisis \
+		are having on the underlying concern or stress level.
+	|
+
+Concern for Safety= INTEG (
+	Change in Concern for Safety,
+		1)
+	~	Dmnl
+	~	General concern for safety experienced by the people in the crisis. \
+		Normalized to a value of 1
+	|
+
+Concern Raised from Evacuation=
+	Activities Dedicated towards Evacuation*Effect of Viewing Evacuation on Concern for Safety
+	~	Dmnl/Hour
+	~	Rate at which concern or stress is generated from people seeing evacuation \
+		activities occurring.
+	|
+
+Crisis Progression=
+	if then else(Time>=Crisis Start Time, Capability to Resist Crisis*Crisis Progression Rate\
+		,0)
+	~	Dmnl/Hour
+	~	Erosion of capabilities due to the crisis. As a physical example, this \
+		would be the rate at which a sinking ship was loosing height about the \
+		water.
+	|
+
+Crisis Progression Rate=
+	0.5
+	~	Dmnl/Hour
+	~	Rate at which the crisis, once begun, is able to erode capabilities
+	|
+
+Crisis Start Time=
+	10
+	~	Hour
+	~	Time at which the outflow 'crisis progression' begins to erode the \
+		capability of the system to support life and resist crisis. If set to a \
+		value outside of the simulation final time, then no crisis occurs
+	|
+
+Successful Evacuation=
+	Total Evacuation Rate*Efficacy of Evacuation Activities
+	~	People/Hour
+	~	Rate at which people are successfully evacuated from the system and survive
+	|
+
+Total Available Activities Possible=
+	Activity Rate*People Exposed to Crisis
+	~	Activity/Hour
+	~	The total available rate of activities that the populace exposed to the \
+		crisis could be doing
+	|
+
+Effectiveness of Mitigation Activities=
+	0.05
+	~	Dmnl/Activity
+	~	Rate at which activities that are being dedicated towards mitigation or \
+		maintenance actually translate into restoring the system's capability to \
+		support life or resist a crisis. Smaller numbers are less effective. \
+		Negative values are outright destructive.
+	|
+
+Initial People=
+	100
+	~	People
+	~	The initial number of people in the system
+	|
+
+Maximum Evacuation Rate=
+	People Exposed to Crisis/Minimum Evacuation Time
+	~	People/Hour
+	~	First-order control on the outflow of people from the system. This is the \
+		absolute maximum rate people can leave the system given the current stock \
+		of people and the minimum evacuation time.
+	|
+
+Minimum Evacuation Time=
+	5/60
+	~	Hour
+	~	Absolute fastest that one can be evacuated
+	|
+
+Time to Update Perceptions of Concern=
+	0.5
+	~	Hour
+	~	Average time for the population to incorporate the perceived capability of \
+		the system to support life and resist  crisis into their underlying stress \
+		or concern level.
+	|
+
+Negative Effect K=
+	-10
+	~	Dmnl
+	~	In the s-shaped function, determines the rate of change at the inflection \
+		point (higher absolute values = steeper change). Negative value here is \
+		used to show increasing negative effects from stress
+	|
+
+Negative Effect X0=
+	1.75
+	~	Dmnl
+	~	In the s-shaped function, determines the input value at which the \
+		inflection point occurs
+	|
+
+Net Effect of Concern on Behavior=
+	Populace Spurred Calm*Populace Spurred Effort
+	~	Dmnl
+	~	The net effect of the two influences of stress on efficiency of behavior. \
+		See DOI 10.2307/3094889
+	|
+
+Populace Spurred Calm=
+	if then else (Concern for Safety<=1,1,1/(1+EXP(-Negative Effect K*(Concern for Safety\
+		-Negative Effect X0)))+0.5)
+	~	Dmnl
+	~	How stress or concern creates a negative effect that reduces efficacy. See \
+		DOI 10.2307/3094889
+	|
+
+Populace Spurred Effort=
+	1/(1+EXP(-Positive Effect K*(Concern for Safety-Positive Effect X0)))+0.5
+	~	Dmnl
+	~	How stress or concern creates a positive effect that increases efficacy. \
+		See DOI 10.2307/3094889
+	|
+
+Positive Effect K=
+	5
+	~	Dmnl
+	~	In the s-shaped function, determines the rate of change at the inflection \
+		point (higher values = steeper change)
+	|
+
+Positive Effect X0=
+	1
+	~	Dmnl
+	~	In the s-shaped function, determines the input value at which the \
+		inflection point occurs
+	|
+
+Sensitivity of Concern to Capability=
+	5
+	~	Dmnl
+	~	Parameter affecting the rate of change of the exponential relationship \
+		between capability and concern.
+	|
+
+Total Evacuation Rate=
+	min(Maximum Evacuation Rate, Effectiveness of Evacuation Activities*Activities Dedicated towards Evacuation\
+		)
+	~	People/Hour
+	~	Total rate at which people are being evacuated from the system
+	|
+
+Unsuccessful Evacuation=
+	Total Evacuation Rate*(1-Efficacy of Evacuation Activities)
+	~	People/Hour
+	~	Rate at which people are evacuated from the system, but unsuccessfully and \
+		perish as a result.
+	|
+
+Effect of Viewing Mitigation on Concern for Safety=
+	0.01
+	~	Dmnl/Activity
+	~	How mitigation or maintenance activities contribute to the concern or \
+		stress of the population exposed to the crisis. Seeing these activities \
+		being performed may be stressful and have a positive value here (for \
+		example seeing life jackets being actively pulled out and put on \
+		passengers on a sinking ship) or even calming and have a negative value \
+		here (for example rearranging the deck chairs on a sinking ship as if \
+		everything is just fine).
+	|
+
+Effect of Viewing Evacuation on Concern for Safety=
+	0.25
+	~	Dmnl/Activity
+	~	How evacuation activities contribute to the concern or stress of the \
+		population exposed to the crisis. Seeing evacuation unfold is assumed to \
+		be stressful in general and more so than the mitigation activities (and \
+		thus this parameter is assumed to have a positive value larger than the \
+		value of the corresponding mitigation parameter)
+	|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 150
+	~	Hour
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Hour
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP
+	~	Hour [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 0.0625
+	~	Hour [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Full Model
+$192-192-192,0,Arial|12||0-0-0|0-0-0|0-0-0|-1--1--1|255-255-255|96,96,80,0
+10,1,Concern for Safety,798,424,48,26,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,2,Populace Spurred Effort,1087,349,52,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,3,1,2,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(945,360)|
+10,4,Populace Spurred Calm,1072,445,52,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,5,1,4,1,0,45,0,2,128,0,-1--1--1,|||0-0-0,1|(967,423)|
+10,6,Net Effect of Concern on Behavior,1400,509,45,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,7,2,6,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1288,398)|
+1,8,4,6,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1236,463)|
+10,9,Concern Raised from Evacuation,647,662,60,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,10,Concern Raised from Preventative Actions,468,640,78,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,11,Effect of Viewing Mitigation on Concern for Safety,528,760,80,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,12,Effect of Viewing Evacuation on Concern for Safety,701,775,85,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,13,12,9,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(667,740)|
+1,14,11,10,1,0,43,0,0,64,0,-1--1--1,,1|(523,704)|
+10,15,Effort Fraction Devoted towards Evacuation,897,605,62,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,16,1,15,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(855,485)|
+10,17,Activities Dedicated towards Evacuation,861,718,74,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,18,15,17,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(887,654)|
+10,19,People Exposed to Crisis,1211,760,57,27,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,20,48,1206,966,10,8,0,3,4,0,-1,0,0,0,0,0,0,0,0,0
+1,21,23,20,4,0,0,22,0,0,0,-1--1--1,,1|(1205,930)|
+1,22,23,19,100,0,0,22,0,0,0,-1--1--1,,1|(1205,839)|
+11,23,0,1205,897,8,6,33,3,0,0,2,0,0,0,0,0,0,0,0,0
+10,24,Successful Evacuation,1156,897,41,18,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,25,48,1199,503,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,26,28,25,4,0,0,22,0,0,0,-1--1--1,,1|(1204,542)|
+1,27,28,19,100,0,0,22,0,0,0,-1--1--1,,1|(1204,659)|
+11,28,0,1204,579,8,6,33,3,0,0,2,0,0,0,0,0,0,0,0,0
+10,29,Unsuccessful Evacuation,1148,579,48,18,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,30,Efficacy of Evacuation Activities,1500,762,41,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,31,30,23,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1401,863)|
+1,32,30,28,1,0,45,0,2,192,0,-1--1--1,|||0-0-0,1|(1423,630)|
+1,33,17,9,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(741,710)|
+12,34,0,736,581,20,20,4,135,0,0,-1,0,0,0,0,0,0,0,0,0
+R1
+12,35,0,738,626,61,16,8,7,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Seeing Evacuations Raises Concern
+12,36,0,649,824,20,20,4,7,0,0,-1,0,0,0,0,0,0,0,0,0
+R/B
+12,37,0,654,875,73,22,8,135,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Seeing Mitigation Raises OR Lowers Concern
+10,38,Capability to Resist Crisis,263,558,60,30,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+12,39,48,251,391,10,8,0,3,3,0,-1,0,0,0,0,0,0,0,0,0
+1,40,42,39,4,0,0,22,0,0,0,-1--1--1,,1|(253,427)|
+1,41,42,38,100,0,0,22,0,0,0,-1--1--1,,1|(253,498)|
+11,42,0,253,462,8,6,33,3,0,0,2,0,0,0,0,0,0,0,0,0
+10,43,Crisis Progression,195,462,50,22,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+12,44,48,254,691,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,45,47,38,4,0,0,22,0,0,0,-1--1--1,,1|(257,610)|
+1,46,47,44,100,0,0,22,0,0,0,-1--1--1,,1|(257,664)|
+11,47,0,257,639,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,48,Crisis Mitigation,324,639,59,10,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,49,6,30,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1488,665)|
+1,50,38,43,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(187,509)|
+10,51,Total Available Activities Possible,916,975,68,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,52,51,17,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(873,897)|
+1,53,19,51,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1068,1059)|
+12,54,0,1115,951,20,20,4,7,0,0,-1,0,0,0,0,0,0,0,0,0
+B2
+12,55,0,1118,987,37,16,8,7,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Depletion of Workers
+12,56,0,822,893,20,20,4,7,0,0,-1,0,0,0,0,0,0,0,0,0
+B/R
+12,57,0,817,930,53,9,8,7,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Saliency of Crisis
+10,58,Effectiveness of Mitigation Activities,425,559,71,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,59,58,48,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(351,583)|
+10,60,Crisis Progression Rate,84,422,65,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,61,60,43,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(97,461)|
+10,62,Activity Rate,1032,1012,45,10,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,63,62,51,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(989,971)|
+10,64,Initial People,1326,828,47,10,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,65,64,19,1,0,0,0,0,128,1,-1--1--1,,1|(1277,806)|
+10,66,Negative Effect K,938,489,51,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,67,Negative Effect X0,1066,525,53,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,68,66,4,1,0,0,0,0,128,0,-1--1--1,,1|(1017,491)|
+1,69,67,4,1,0,0,0,0,128,0,-1--1--1,,1|(1078,506)|
+10,70,Effectiveness of Evacuation Activities,962,870,85,18,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+10,71,Total Evacuation Rate,993,769,60,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,72,17,71,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(932,755)|
+1,73,70,71,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(953,819)|
+10,74,Minimum Evacuation Time,1125,826,61,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,75,Maximum Evacuation Rate,1104,674,60,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,76,19,75,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1165,700)|
+1,77,74,75,1,0,45,0,2,192,0,-1--1--1,|||0-0-0,1|(1095,770)|
+1,78,75,71,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1032,716)|
+1,79,71,29,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1005,673)|
+1,80,71,24,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1015,807)|
+10,81,Indicated Concern from Capability,396,393,67,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,82,38,81,1,0,45,0,2,64,0,-1--1--1,|||0-0-0,1|(305,461)|
+12,83,48,540,424,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,84,86,1,4,0,0,22,0,0,0,-1--1--1,,1|(695,418)|
+1,85,86,83,68,0,0,22,2,0,0,-1--1--1,|||0-0-0,1|(589,418)|
+11,86,0,635,418,6,8,34,3,0,0,3,0,0,0,0,0,0,0,0,0
+10,87,Change in Concern for Safety,635,389,88,21,40,131,0,0,-1,0,0,0,0,0,0,0,0,0
+10,88,Time to Update Perceptions of Concern,746,257,57,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,89,Crisis Start Time,238,312,51,21,8,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,90,89,43,1,0,0,0,0,128,0,-1--1--1,,1|(199,385)|
+10,91,Time,140,355,29,10,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,92,91,43,1,0,0,0,0,128,0,-1--1--1,,1|(164,427)|
+10,93,Concern Response Sensitivity,772,541,71,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,94,93,15,1,0,0,0,0,128,0,-1--1--1,,1|(811,582)|
+10,95,Change in Concern from Perceived Capability,587,314,71,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,96,88,95,1,0,45,0,2,192,0,-1--1--1,|||0-0-0,1|(664,258)|
+1,97,81,95,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(480,337)|
+1,98,1,95,1,0,45,0,2,192,0,-1--1--1,|||0-0-0,1|(758,343)|
+1,99,95,87,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(617,330)|
+10,100,Baseline Efficacy of Evacuation Activities,1437,913,76,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,101,100,30,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(1484,841)|
+10,102,Crisis Mitigation Activities,494,890,60,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,103,102,48,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(383,834)|
+1,104,102,10,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(450,807)|
+10,105,Capability Gap,188,750,55,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,106,38,105,1,0,45,0,2,192,0,-1--1--1,|||0-0-0,1|(205,633)|
+10,107,Baseline Capability,105,638,37,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,108,107,38,1,0,43,0,2,192,1,-1--1--1,|||0-0-0,1|(149,590)|
+1,109,107,105,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(118,676)|
+10,110,"Fraction of Non-Evacuation Efforts Spent of Mitigation",243,841,84,27,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,111,105,110,1,0,43,0,2,192,0,-1--1--1,|||0-0-0,1|(196,787)|
+1,112,110,102,1,0,43,0,2,128,0,-1--1--1,|||0-0-0,1|(374,909)|
+10,113,Minimum Viable Capability,1272,636,59,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+12,114,48,1412,758,10,8,0,3,4,0,-1,0,0,0,0,0,0,0,0,0
+1,115,117,114,4,0,0,22,0,0,0,-1--1--1,,1|(1371,758)|
+1,116,117,19,100,0,0,22,0,0,0,-1--1--1,,1|(1298,758)|
+11,117,0,1335,758,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,118,Death from Crisis,1335,784,41,18,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,119,Capability to Resist Crisis,1379,651,52,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,120,Avg Time for Death Under Crisis,1406,704,70,18,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+1,121,113,117,1,0,0,0,0,128,0,-1--1--1,,1|(1290,692)|
+1,122,120,117,1,0,0,0,0,128,0,-1--1--1,,1|(1370,735)|
+1,123,119,117,1,0,0,0,0,128,0,-1--1--1,,1|(1335,688)|
+1,124,19,117,1,0,0,0,0,128,0,-1--1--1,,1|(1274,723)|
+12,125,0,1180,391,20,20,4,7,0,0,-1,0,0,0,0,0,0,0,0,0
+B1
+12,126,0,1183,427,47,16,8,7,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Concern Drives Evacuation
+12,127,0,275,739,20,20,5,7,0,0,-1,0,0,0,0,0,0,0,0,0
+B3
+12,128,0,278,781,43,16,8,135,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Rebuild Capability
+12,129,0,443,449,20,20,4,7,0,0,-1,0,0,0,0,0,0,0,0,0
+R2
+12,130,0,438,506,79,24,8,135,0,24,-1,0,0,0,-1--1--1,0-0-0,|10|I|0-0-0,0,0,0,0,0,0
+Higher Capability Reduces Time Spent Evacuating
+12,131,0,1924,349,354,218,3,188,0,0,2,0,0,0,0,0,0,0,0,0
+Survival Rate,Graph
+12,132,0,1922,794,354,218,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Outcomes
+10,133,Positive Effect K,1187,287,60,10,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,134,133,2,0,0,0,0,0,64,0,-1--1--1,,1|(0,0)|
+10,135,Positive Effect X0,956,293,53,18,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,136,135,2,0,0,0,0,0,64,0,-1--1--1,,1|(0,0)|
+10,137,Sensitivity of Concern to Capability,383,291,46,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,138,137,81,0,0,0,0,0,64,0,-1--1--1,,1|(0,0)|
+10,139,Change in Concern from Viewing Activities,619,504,83,18,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,140,139,87,1,0,0,0,0,64,0,-1--1--1,,1|(632,453)|
+10,141,Activities Available for Mitigation,656,940,69,18,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,142,141,102,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(562,939)|
+10,143,Capability Gap Sensitivity,228,947,55,18,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,144,143,110,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(247,905)|
+1,145,17,141,1,0,45,0,2,64,0,-1--1--1,|||0-0-0,1|(783,862)|
+1,146,51,141,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(787,982)|
+1,147,9,139,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(608,595)|
+1,148,10,139,1,0,43,0,2,64,0,-1--1--1,|||0-0-0,1|(522,556)|
+12,149,0,2642,349,354,218,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Capability_-_Concern_Phase_Plot
+12,150,0,2640,795,354,218,3,188,0,0,1,0,0,0,0,0,0,0,0,0
+Concern_Effects
+10,151,Died,1789,1168,28,10,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+12,152,0,378,90,204,27,8,135,0,24,-1,0,0,0,-1--1--1,0-0-0,|18|BU|0-0-0,0,0,0,0,0,0
+Rearranging the Deck Chairs
+12,153,0,394,125,192,18,8,135,0,24,-1,0,0,0,-1--1--1,0-0-0,|14|BI|0-0-0,0,0,0,0,0,0
+A model of Dynamic Response to Crisis
+12,154,0,370,161,71,14,8,135,0,16,-1,0,0,0,-1--1--1,0-0-0,||B|0-0-0,0,0,0,0,0,0
+Dr. James Paine
+12,155,0,711,144,84,27,8,7,0,0,-1,0,0,0,0,0,0,0,0,0
+Note: recommended to "Switch to Old GUI" to match figures
+12,156,0,368,191,81,17,8,135,0,0,-1,0,0,0,0,0,0,0,0,0
+https://jpaine.info
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Accounting
+$192-192-192,0,Arial|12||0-0-0|0-0-0|0-0-0|-1--1--1|255-255-255|96,96,100,0
+10,1,Died,567,127,40,20,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,2,Evacuated and Survived,560,295,40,20,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,3,Unsuccessful Evacuation,954,67,53,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,4,Successful Evacuation,590,380,46,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,5,4,2,1,0,0,0,0,128,0,-1--1--1,,1|(602,337)|
+10,6,Death from Crisis,961,193,46,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,7,Survival Rate,443,207,48,10,8,3,0,0,0,0,0,0,0,0,0,0,0,0
+10,8,Initial People,650,208,56,10,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,9,8,7,1,0,0,0,0,128,0,-1--1--1,,1|(561,200)|
+12,10,0,503,616,291,167,3,188,0,0,2,0,0,0,0,0,0,0,0,0
+Survival Rate,Graph
+1,11,1,7,1,0,0,0,0,128,0,-1--1--1,,1|(472,169)|
+10,12,Died from Unsuccessful Evacuation,737,63,51,23,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,13,3,12,1,0,0,0,0,128,0,-1--1--1,,1|(834,98)|
+10,14,Died from Crossing Minimum Threshold,786,180,49,30,3,131,0,0,0,0,0,0,0,0,0,0,0,0
+1,15,6,14,1,0,0,0,0,128,0,-1--1--1,,1|(935,137)|
+1,16,12,1,1,0,0,0,0,128,0,-1--1--1,,1|(638,71)|
+1,17,14,1,1,0,0,0,0,128,0,-1--1--1,,1|(641,175)|
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 3
+$192-192-192,0,Arial|12||0-0-0|0-0-0|0-0-0|-1--1--1|255-255-255|96,96,90,0
+12,1,0,857,303,354,218,3,188,0,0,2,0,0,0,0,0,0,0,0,0
+Survival Rate,Graph
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 4
+$192-192-192,0,Arial|12||0-0-0|0-0-0|0-0-0|-1--1--1|255-255-255|96,96,100,0
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 5
+$192-192-192,0,Vensim Sans|12||0-0-0|0-0-0|0-0-255|255-255-255|255-255-255|96,96,100,0
+///---\\\
+:GRAPH Outcomes
+:TITLE Outcomes
+:STACK-FILL 0
+:SCALE
+:VAR People Exposed to Crisis
+:Y-MIN 0
+:Y-MAX 100
+:DATASET 
+:VAR Died from Crossing Minimum Threshold
+:DATASET 
+:VAR Died from Unsuccessful Evacuation
+:DATASET 
+:VAR Evacuated and Survived
+:DATASET 
+
+:GRAPH Capability_-_Concern_Phase_Plot
+:TITLE Capability - Concern Phase Plot
+:X-AXIS Capability to Resist Crisis
+:SCALE
+:VAR Concern for Safety
+:DATASET 
+:LINE-WIDTH 2
+
+:GRAPH Concern_Effects
+:TITLE Net Effect of Concern on Behavior
+:X-AXIS Concern for Safety
+:SCALE
+:VAR Net Effect of Concern on Behavior
+:DATASET 
+:LINE-WIDTH 2
+
+:GRAPH Concern_Phase_Plot
+:TITLE Concern_Phase_Plot
+:X-AXIS Concern for Safety
+:SCALE
+:VAR Change in Concern for Safety
+:DATASET 
+:LINE-WIDTH 2
+:L<%^E!@
+4:Time
+5:Indicated Concern from Capability
+9:Baseline
+19:80,0
+24:0
+25:150
+26:150
+57:1
+54:0
+55:0
+82:0
+86:0
+59:0
+56:0
+58:0
+71:0
+110:0
+111:0
+44:65001
+46:0
+45:5
+49:1
+50:0
+51:
+52:
+53:
+43:VeryMarginalEffStressing
+47:Baseline
+48:DeckChairs.lst
+22:Activity,Activities
+22:Hour,Hours
+22:People,Person
+15:0,0,0,0,0,0
+27:0,
+34:0,
+42:0
+72:0
+73:0
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:5
+41:0
+95:0
+96:0
+97:0
+77:0
+78:0
+102:0
+93:0
+94:0
+92:0
+91:0
+90:0
+87:0
+75:
+43:VeryMarginalEffStressing
+103:8,8,8,3,8
+105:0,0,0,0,0,0,0,0,0,0
+104:Arial|12||0-0-0|0-0-0|-1--1--1|0-0-0|192-192-192|-1--1--1
