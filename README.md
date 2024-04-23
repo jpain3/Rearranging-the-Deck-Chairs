@@ -3,7 +3,7 @@ Supporting Models and Write-ups for the project 'Rearranging the Deck Chairs on 
 
 The 'Presentations' folder has PowerPoints and posters that describes this project at a higher summary level.
 
-The main repository has the current revision of the manuscript.
+The 'Papers' folder has current and former revisions of the manuscript.
 
 Note that the model files are in .mdl format, which can be viewed using Vensim. There is a free viewer provided by Ventana Systems available at https://vensim.com/vensim-model-reader/
 
